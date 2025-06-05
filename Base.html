@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhancing a Hybrid Volatility Forecasting Framework</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Modern Professional -->
+    <!-- Application Structure Plan: The SPA is designed as an interactive, single-page dashboard to guide users through the complex proposals of the source report. It abandons the linear report format for a thematic, modular structure. The user flow starts with a high-level overview of the current model, establishing a baseline. It then transitions to highlighting the model's core limitations, creating a clear justification for the proposed enhancements. The main body consists of distinct, interactive sections for each key improvement area (Regime Detection, Core Models, etc.). This modularity, combined with a sticky top navigation, allows for both linear discovery (scrolling) and non-linear exploration (jumping to sections). This structure was chosen to make dense, technical information digestible and engaging, transforming passive reading into an active learning experience. -->
+    <!-- Visualization & Content Choices: Each key concept from the report is translated into an interactive element. For comparing regime detection methods, a grouped bar chart is used for its clear comparative power (Goal: Compare -> Viz: Bar Chart -> Interaction: Hover details -> Justification: Better than text table). For the GARCH leverage effect, a togglable line chart visually demonstrates the concept of asymmetry (Goal: Inform -> Viz: Line Chart -> Interaction: Button toggle -> Justification: Makes abstract concept tangible). Dynamic Beta is shown with an animated-style line chart to represent its time-varying nature. Complex processes like ensemble stacking and walk-forward optimization are represented using diagrams built with HTML/CSS, as they are clearer than text for showing flows (Goal: Organize -> Viz: HTML Diagram -> Justification: Clarifies architecture). The Pareto Front is a scatter plot, the most effective visualization for this concept (Goal: Relationships -> Viz: Scatter Plot -> Interaction: Hover -> Justification: Shows trade-offs). All visualizations use Chart.js (Canvas), adhering to the NO SVG/Mermaid constraint. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F9FA;
+            color: #212529;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #0D6EFD;
+            border-bottom-color: #0D6EFD;
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .tab-button {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .tab-button.active {
+            background-color: #0D6EFD;
+            color: white;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 lg:px-6">
+            <div class="flex justify-between items-center py-4">
+                <h1 class="text-xl font-bold text-gray-800">Adaptive Volatility Framework</h1>
+                <div class="hidden lg:flex items-center space-x-6">
+                    <a href="#overview" class="nav-link text-gray-600 font-medium pb-1">Overview</a>
+                    <a href="#regime-detection" class="nav-link text-gray-600 font-medium pb-1">Regime Detection</a>
+                    <a href="#core-models" class="nav-link text-gray-600 font-medium pb-1">Core Models</a>
+                    <a href="#ensemble" class="nav-link text-gray-600 font-medium pb-1">Ensemble</a>
+                    <a href="#optimization" class="nav-link text-gray-600 font-medium pb-1">Optimization</a>
+                    <a href="#validation" class="nav-link text-gray-600 font-medium pb-1">Validation</a>
+                </div>
+                <div class="lg:hidden">
+                    <select id="mobile-nav" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        <option value="#hero">Home</option>
+                        <option value="#overview">Overview</option>
+                        <option value="#regime-detection">Regime Detection</option>
+                        <option value="#core-models">Core Models</option>
+                        <option value="#ensemble">Ensemble</option>
+                        <option value="#optimization">Optimization</option>
+                        <option value="#validation">Validation</option>
+                    </select>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 lg:px-6 py-8 md:py-12">
+        <section id="hero" class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">Enhancing a Hybrid Volatility Forecasting Framework</h2>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">An interactive exploration of strategic improvements to a financial model, designed to elevate predictive accuracy, robustness, and deliver more actionable insights in dynamic markets.</p>
+        </section>
+
+        <section id="overview" class="mb-20">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold text-gray-800">The Current Framework: A Hybrid Approach</h3>
+                <p class="mt-2 text-md text-gray-500">The existing model provides a solid foundation by combining statistical and deep learning methods. This section outlines its architecture and identifies key areas with potential for significant enhancement.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="card p-6">
+                    <h4 class="font-bold text-xl mb-3 text-gray-700">Core Components</h4>
+                    <ul class="space-y-3 text-gray-600">
+                        <li class="flex items-start"><span class="text-blue-500 font-bold mr-2">&#10140;</span> <strong>GARCH:</strong> Captures volatility clustering (periods of high/low volatility clumping together).</li>
+                        <li class="flex items-start"><span class="text-blue-500 font-bold mr-2">&#10140;</span> <strong>Beta:</strong> Measures systematic risk relative to the market.</li>
+                        <li class="flex items-start"><span class="text-blue-500 font-bold mr-2">&#10140;</span> <strong>LSTM:</strong> A deep learning model to identify complex temporal patterns in price data.</li>
+                    </ul>
+                </div>
+                <div class="card p-6">
+                    <h4 class="font-bold text-xl mb-3 text-gray-700">Operational Flow</h4>
+                     <ol class="space-y-3 text-gray-600 list-decimal list-inside">
+                        <li><strong>Regime Identification:</strong> Uses Simple Moving Average (SMA) crossovers to classify the market as "Bullish" or "Bearish".</li>
+                        <li><strong>Model Combination:</strong> Employs linear regression to find the optimal weights for GARCH, Beta, and LSTM.</li>
+                        <li><strong>Optimization Goal:</strong> The weights are optimized to maximize a single metric: the Sharpe Ratio.</li>
+                    </ol>
+                </div>
+                <div class="md:col-span-2 mt-4 text-center p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <h4 class="font-semibold text-lg text-yellow-800">Key Limitation</h4>
+                    <p class="text-yellow-700 mt-1">While effective, this approach relies on lagging indicators (SMA), assumes linear relationships, and uses static risk measures, limiting its adaptability in rapidly changing, non-linear markets.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="regime-detection" class="mb-20">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold text-gray-800">Advancing Market Regime Identification</h3>
+                 <p class="mt-2 text-md text-gray-500 max-w-3xl mx-auto">The project's foundation is "regime-aware" modeling. To be truly adaptive, we must move beyond simplistic, lagging indicators like SMA crossovers. This section explores advanced techniques that offer a more nuanced, timely, and probabilistic understanding of market states.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8 items-start">
+                <div class="chart-container h-96 md:h-[450px]">
+                    <canvas id="regimeDetectionChart"></canvas>
+                </div>
+                <div class="space-y-4">
+                     <div class="card p-6">
+                        <h4 class="font-bold text-xl mb-2 text-gray-700">Hidden Markov Models (HMMs)</h4>
+                        <p class="text-gray-600">Identifies unobservable "hidden" market states (e.g., low-volatility bull, high-volatility bear) and models the probability of switching between them. Provides a more granular and forward-looking view.</p>
+                    </div>
+                    <div class="card p-6">
+                        <h4 class="font-bold text-xl mb-2 text-gray-700">Clustering Algorithms</h4>
+                        <p class="text-gray-600">Uses unsupervised learning (e.g., K-Means) to group similar market conditions based on multiple features, discovering natural, data-driven regimes beyond a simple bull/bear binary.</p>
+                    </div>
+                     <div class="card p-6">
+                        <h4 class="font-bold text-xl mb-2 text-gray-700">Markov-Switching GARCH (MS-GARCH)</h4>
+                        <p class="text-gray-600">Integrates regime-switching directly into the volatility model itself, allowing GARCH parameters to change based on the underlying market state, making it intrinsically adaptive.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="core-models" class="mb-20">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold text-gray-800">Refining Core Volatility & Risk Components</h3>
+                <p class="mt-2 text-md text-gray-500 max-w-3xl mx-auto">The strength of the hybrid model depends on the quality of its inputs. This section details crucial upgrades for each core component—GARCH, LSTM, and Beta—to better capture the complex, asymmetric, and time-varying nature of financial risk.</p>
+            </div>
+            
+            <div class="mb-8 flex justify-center">
+                <div class="flex space-x-2 bg-gray-200 p-1 rounded-lg">
+                    <button data-tab="garch" class="tab-button px-4 py-2 rounded-md font-medium text-sm md:text-base active">GARCH</button>
+                    <button data-tab="lstm" class="tab-button px-4 py-2 rounded-md font-medium text-sm md:text-base">LSTM</button>
+                    <button data-tab="beta" class="tab-button px-4 py-2 rounded-md font-medium text-sm md:text-base">Beta</button>
+                </div>
+            </div>
+
+            <div id="garch-content" class="tab-content">
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h4 class="font-bold text-2xl mb-2">The Leverage Effect: Asymmetric GARCH</h4>
+                        <p class="text-gray-600 mb-4">Standard GARCH models assume positive and negative shocks have a symmetric impact on volatility. In reality, negative news ("bad news") often increases volatility far more than positive news of the same magnitude. Asymmetric GARCH models capture this crucial "leverage effect."</p>
+                        <div class="space-y-2">
+                           <p><strong>&#10140; EGARCH/GJR-GARCH:</strong> Explicitly model this asymmetry for more accurate risk forecasts, especially in bearish markets.</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                         <canvas id="garchChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="lstm-content" class="tab-content hidden">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="card p-6">
+                        <h4 class="font-bold text-xl mb-2">Attention Mechanisms</h4>
+                        <p class="text-gray-600">Enhances LSTMs by allowing the model to dynamically focus on the most relevant past information when making a prediction. This improves accuracy and adds interpretability by showing what the model is "paying attention to."</p>
+                    </div>
+                    <div class="card p-6">
+                        <h4 class="font-bold text-xl mb-2">Transformer Models</h4>
+                        <p class="text-gray-600">A state-of-the-art architecture that surpasses LSTMs in capturing very long-range dependencies. Its parallel processing capabilities make it faster and more powerful for complex financial time series.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="beta-content" class="tab-content hidden">
+                 <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h4 class="font-bold text-2xl mb-2">From Static to Dynamic Beta</h4>
+                        <p class="text-gray-600 mb-4">The current model uses a static, backward-looking Beta. However, an asset's sensitivity to the market is not constant; it changes over time. Dynamic Beta models provide a more realistic, time-varying measure of systematic risk.</p>
+                        <div class="space-y-2">
+                           <p><strong>&#10140; Kalman Filters:</strong> A recursive algorithm to estimate a continuously evolving Beta.</p>
+                           <p><strong>&#10140; Conditional Beta:</strong> Estimates separate "upside" and "downside" Betas, aligning perfectly with the regime-aware framework.</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="betaChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="ensemble" class="mb-20">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold text-gray-800">Sophisticated Ensemble Strategies</h3>
+                <p class="mt-2 text-md text-gray-500 max-w-3xl mx-auto">The method of combining model outputs is as important as the models themselves. This section proposes moving beyond simple linear regression to advanced non-linear techniques that can capture complex interactions and adapt more intelligently to any market condition.</p>
+            </div>
+             <div class="grid md:grid-cols-2 gap-10">
+                <div class="card p-6">
+                    <h4 class="text-xl font-bold mb-4 text-center">From: Linear Combination</h4>
+                    <div class="space-y-4 text-center">
+                        <div class="flex justify-center space-x-2">
+                            <div class="bg-blue-100 text-blue-800 p-2 rounded">GARCH</div>
+                            <div class="bg-green-100 text-green-800 p-2 rounded">LSTM</div>
+                            <div class="bg-purple-100 text-purple-800 p-2 rounded">Beta</div>
+                        </div>
+                        <div class="text-2xl font-bold">&darr;</div>
+                        <div class="bg-gray-200 text-gray-800 p-3 rounded-lg font-mono">Linear Regression</div>
+                        <div class="text-2xl font-bold">&darr;</div>
+                        <div class="bg-red-100 text-red-800 font-semibold p-3 rounded-full">Optimized Sharpe Ratio</div>
+                    </div>
+                </div>
+                 <div class="card p-6 border-2 border-blue-500">
+                    <h4 class="text-xl font-bold mb-4 text-center">To: Non-Linear Stacking & Meta-Learning</h4>
+                     <div class="space-y-4 text-center">
+                        <div class="flex justify-center space-x-2">
+                            <div class="bg-blue-100 text-blue-800 p-2 rounded">GARCH</div>
+                            <div class="bg-green-100 text-green-800 p-2 rounded">LSTM</div>
+                            <div class="bg-purple-100 text-purple-800 p-2 rounded">Beta</div>
+                        </div>
+                        <div class="text-2xl font-bold">&darr;</div>
+                        <div class="bg-gray-200 text-gray-800 p-3 rounded-lg font-mono">Meta-Learner (e.g., XGBoost, NN)</div>
+                        <div class="text-2xl font-bold">&darr;</div>
+                        <div class="bg-red-100 text-red-800 font-semibold p-3 rounded-full">Robust, Adaptive Optimization</div>
+                         <p class="text-sm text-gray-500 pt-2"><strong>Meta-Learning:</strong> Trains the model to "learn how to learn," allowing it to adapt to novel market regimes it hasn't seen before, moving from a static rule-book to a truly intelligent agent.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="optimization" class="mb-20">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold text-gray-800">Expanding Portfolio Optimization Objectives</h3>
+                <p class="mt-2 text-md text-gray-500 max-w-3xl mx-auto">Investors have diverse goals. Optimizing for the Sharpe Ratio alone ignores other crucial risk dimensions like tail risk and capital preservation. This section introduces downside-focused metrics and multi-objective optimization to provide a richer, more flexible set of "optimal" strategies.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="space-y-4">
+                    <div class="card p-6">
+                        <h4 class="font-bold text-xl mb-2 text-gray-700">Beyond Sharpe: Downside Risk Metrics</h4>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li><strong>Sortino Ratio:</strong> Penalizes only downside volatility, not desirable upside gains.</li>
+                            <li><strong>Calmar Ratio / Max Drawdown:</strong> Focuses on the worst-case loss, crucial for capital preservation.</li>
+                        </ul>
+                    </div>
+                     <div class="card p-6">
+                        <h4 class="font-bold text-xl mb-2 text-gray-700">Multi-Objective Optimization & The Pareto Front</h4>
+                        <p class="text-gray-600">Instead of one "best" solution, this generates a set of optimal solutions (a Pareto Front) that represent the best possible trade-offs between multiple conflicting objectives (e.g., maximizing return while minimizing drawdown). This empowers investors to choose a strategy that truly aligns with their personal risk tolerance.</p>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="paretoChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="validation" class="mb-20">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold text-gray-800">Implementing Rigorous Validation</h3>
+                 <p class="mt-2 text-md text-gray-500 max-w-3xl mx-auto">A model's historical performance can be misleading due to overfitting and other biases. To ensure real-world viability, this section outlines advanced validation techniques that provide a much more realistic and trustworthy assessment of the framework's potential.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-6">
+                 <div class="card p-6">
+                    <h4 class="font-bold text-xl mb-2 text-gray-700">Walk-Forward Optimization</h4>
+                    <p class="text-gray-600">A more realistic backtest that mimics live trading by sequentially training on a block of data and testing on the next, incrementally "walking forward" through time. This mitigates overfitting.</p>
+                </div>
+                <div class="card p-6">
+                    <h4 class="font-bold text-xl mb-2 text-gray-700">Monte Carlo Simulations</h4>
+                    <p class="text-gray-600">Runs thousands of random market scenarios to stress-test the model's robustness and understand the distribution of potential outcomes, including extreme "black swan" events.</p>
+                </div>
+                <div class="card p-6">
+                    <h4 class="font-bold text-xl mb-2 text-gray-700">Realistic Costs & Slippage</h4>
+                    <p class="text-gray-600">Incorporates real-world trading frictions like commissions, bid-ask spreads, and market impact, which are often ignored in simple backtests but are critical for estimating true profitability.</p>
+                </div>
+            </div>
+        </section>
+        
+    </main>
+    
+    <footer class="bg-gray-800 text-white mt-12">
+        <div class="container mx-auto px-6 py-4 text-center">
+            <p>&copy; 2025 Interactive Financial Model Analysis. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const mobileNav = document.getElementById('mobile-nav');
+            mobileNav.addEventListener('change', (e) => {
+                window.location.hash = e.target.value;
+            });
+
+            const sections = document.querySelectorAll('main section');
+            const navLinks = document.querySelectorAll('header nav a');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.3
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${id}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                        if (mobileNav.value !== `#${id}`) {
+                           mobileNav.value = `#${id}`;
+                        }
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            function renderRegimeDetectionChart() {
+                const ctx = document.getElementById('regimeDetectionChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Timeliness', 'Granularity', 'Adaptability'],
+                        datasets: [{
+                            label: 'SMA Crossover (Current)',
+                            data: [2, 2, 3],
+                            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }, {
+                            label: 'Advanced Methods (Proposed)',
+                            data: [8, 9, 9],
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Effectiveness of Regime Detection Methods'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += `Score ${context.parsed.y}/10`;
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 10,
+                                title: {
+                                    display: true,
+                                    text: 'Effectiveness Score'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            function renderGarchChart() {
+                const ctx = document.getElementById('garchChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['-3%', '-2%', '-1%', '0', '+1%', '+2%', '+3%'],
+                        datasets: [{
+                            label: 'Symmetric Response',
+                            data: [9, 4, 1, 0, 1, 4, 9],
+                            borderColor: 'rgba(255, 159, 64, 1)',
+                            backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                            fill: false,
+                            tension: 0.4
+                        }, {
+                            label: 'Asymmetric "Leverage" Response',
+                            data: [15, 8, 3, 0, 0.5, 1, 1.5],
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            fill: false,
+                            tension: 0.4,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Volatility Response to Market Shocks'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Market Shock Magnitude'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Increase in Volatility'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            function renderBetaChart() {
+                const ctx = document.getElementById('betaChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Q1', 'Q2', 'Q3', 'Q4', 'Q1', 'Q2', 'Q3', 'Q4'],
+                        datasets: [{
+                            label: 'Static Beta',
+                            data: [1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2],
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderDash: [5, 5],
+                            fill: false,
+                        }, {
+                            label: 'Dynamic Beta',
+                            data: [1.1, 1.3, 1.4, 0.9, 0.8, 1.1, 1.5, 1.3],
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            fill: false,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                         responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Static vs. Dynamic Beta Over Time'
+                            }
+                        },
+                        scales: {
+                             y: {
+                                title: {
+                                    display: true,
+                                    text: 'Beta Value'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            function renderParetoChart() {
+                const ctx = document.getElementById('paretoChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'Pareto Optimal Solutions',
+                            data: [
+                                {x: 10, y: 5}, {x: 9, y: 7}, {x: 8, y: 8}, 
+                                {x: 7, y: 9}, {x: 6, y: 10}, {x: 5, y: 10.5},
+                                {x: 4, y: 10.8}, {x: 3, y: 11}
+                            ],
+                            backgroundColor: 'rgba(75, 192, 192, 1)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                        },{
+                            label: 'Sub-Optimal Solutions',
+                             data: [
+                                {x: 10, y: 2}, {x: 9, y: 4}, {x: 8, y: 6}, 
+                                {x: 7, y: 7}, {x: 6, y: 8}, {x: 5, y: 9},
+                                {x: 4, y: 9.5}, {x: 3, y: 10}
+                            ],
+                            backgroundColor: 'rgba(255, 99, 132, 0.5)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Multi-Objective Optimization: Pareto Front'
+                            },
+                             tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `Risk: ${context.parsed.x}, Return: ${context.parsed.y}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                title: {
+                                    display: true,
+                                    text: 'Risk (e.g., Max Drawdown %)'
+                                },
+                                reverse: true
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Expected Return %'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.dataset.tab;
+
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    tabContents.forEach(content => {
+                        if (content.id === `${tabId}-content`) {
+                            content.classList.remove('hidden');
+                        } else {
+                            content.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            renderRegimeDetectionChart();
+            renderGarchChart();
+            renderBetaChart();
+            renderParetoChart();
+        });
+    </script>
+
+</body>
+</html>
